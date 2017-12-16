@@ -1,11 +1,11 @@
 package e.hribhrib.ima_a_1;
 
 import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -26,26 +26,26 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     float dw;
     float dh;
 
-    Bitmap saveUp;
-    Bitmap saveDown;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         currentDisplay = getWindowManager().getDefaultDisplay();
-        dw = currentDisplay.getWidth();
-        dh = currentDisplay.getHeight() / 2;
+        Point size = new Point();
+        currentDisplay.getSize(size);
+        dw = size.x;
+        dh = size.y/2;
 
-        imageViewUp = (ImageView) this.findViewById(R.id.imageViewUp);
-        imageViewDown = (ImageView) this.findViewById(R.id.imageViewDown);
 
-        tvUp = (TextView) this.findViewById(R.id.textViewUp);
-        tvDown = (TextView) this.findViewById(R.id.textViewDown);
+        imageViewUp = this.findViewById(R.id.imageViewUp);
+        imageViewDown = this.findViewById(R.id.imageViewDown);
 
-        tvUp.setWidth(currentDisplay.getWidth()/3);
-        tvDown.setWidth(currentDisplay.getWidth()/3);
+        tvUp = this.findViewById(R.id.textViewUp);
+        tvDown = this.findViewById(R.id.textViewDown);
+
+        tvUp.setWidth(size.y / 3);
+        tvDown.setWidth(size.y / 3);
 
         initBitmapAndCanvas();
 
@@ -81,20 +81,10 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     }
 
     public boolean onTouch(View v, MotionEvent event) {
-        System.out.println("touch");
-        System.out.print("x:" + event.getX());
-        System.out.print("y:" + event.getY());
-        System.out.println();
-
         int pointerCount = event.getPointerCount();
 
-        System.out.println(pointerCount);
-
         try {
-
             for (int i = 0; i < pointerCount; i++) {
-
-
                 int x = (int) event.getX(i);
                 int y = (int) event.getY(i);
                 int id = event.getPointerId(i);
@@ -115,7 +105,6 @@ public class MainActivity extends Activity implements View.OnTouchListener {
                         break;
                 }
 
-
                 if (v.getId() == imageViewUp.getId()) {
                     tvUp.setText(x + "/" + y);
                     canvasUp.drawPoint(x, y, paint);
@@ -125,42 +114,14 @@ public class MainActivity extends Activity implements View.OnTouchListener {
                     canvasDown.drawPoint(x, y, paint);
                     imageViewDown.invalidate();
                 }
-
-
-                System.out.println("Action: " + " Index: " + actionIndex + " ID: " + id + " X: " + x + " Y: " + y);
             }
-        } catch (Exception e) {
-
-        }
-
-
-
+        } catch (Exception e) {}
         return true;
     }
-
 
     public void clearDisplay(android.view.View v) {
         initBitmapAndCanvas();
         tvUp.setText("");
         tvDown.setText("");
-    }
-
-
-    //Use onSaveInstanceState(Bundle) and onRestoreInstanceState
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        saveUp = bitmapUp.copy(bitmapUp.getConfig(),true);
-        saveDown = bitmapDown.copy(bitmapDown.getConfig(),true);
-
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
-//onRestoreInstanceState
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        bitmapUp = saveUp.copy(saveUp.getConfig(),true);
-        bitmapDown = saveDown.copy(saveDown.getConfig(),true);
     }
 }
